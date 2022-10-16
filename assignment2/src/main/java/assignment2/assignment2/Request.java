@@ -4,9 +4,8 @@ public class Request {
     private long id;
     private String from;
     private String to;
-//    private String fromAmount;
-//    private String toAmount;
-
+    private String amountFrom;
+    private String amountTo;
 
     public long getId() {
         return id;
@@ -16,35 +15,35 @@ public class Request {
         this.id = id;
     }
 
-//    public String getFromAmount() {
-//        return fromAmount;
-//    }
-//
-//    public void setFromAmount(String fromAmount) {
-//        this.fromAmount = fromAmount;
-//    }
-//
-//    public String getToAmount() {
-//        return toAmount;
-//    }
-//
-//    public void setToAmount(String toAmount) {
-//        this.toAmount = toAmount;
-//    }
-
     public String getFrom() {
         return from;
     }
 
-    public void setDateFrom(String dateFrom) {
-        this.from = dateFrom;
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     public String getTo() {
         return to;
     }
 
-    public void setDateTo(String dateTo) {
-        this.to = dateTo;
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public String getAmountFrom() {
+        return amountFrom;
+    }
+
+    public void setAmountFrom(String amountFrom) {
+        this.amountFrom = amountFrom;
+    }
+
+    public String getAmountTo() {
+        return amountTo;
+    }
+
+    public void setAmountTo(String amountTo) {
+        this.amountTo = amountTo;
     }
 }

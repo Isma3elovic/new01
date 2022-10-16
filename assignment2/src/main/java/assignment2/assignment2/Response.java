@@ -4,6 +4,8 @@ public class Response {
     long id;
     private String from;
     private String to;
+    private String amountFrom;
+    private String amountTo;
 
     public long getId() {
         return id;
@@ -27,5 +29,21 @@ public class Response {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String getAmountFrom() {
+        return amountFrom;
+    }
+
+    public void setAmountFrom(String amountFrom) {
+        this.amountFrom = amountFrom;
+    }
+
+    public String getAmountTo() {
+        return amountTo;
+    }
+
+    public void setAmountTo(String amountTo) {
+        this.amountTo = amountTo;
     }
 }

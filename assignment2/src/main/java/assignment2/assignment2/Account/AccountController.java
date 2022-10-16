@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static jdk.nashorn.internal.objects.NativeString.valueOf;
+
 
 @RestController
 @RequestMapping("/api/v1/statment")
@@ -38,13 +40,13 @@ public class AccountController {
     Dto dto = new Dto();
 
     @PostMapping("/all")
-    public ResponseEntity<Object> findById(@RequestBody Request req )  {
+    public ResponseEntity<Object> findById(@RequestBody Request req) {
         Response res = new Response();
-        BeanUtils.copyProperties(req,res);
+        BeanUtils.copyProperties(req, res);
         System.out.println(res.getId());
-       // return ResponseEntity.ok(res);
+        // return ResponseEntity.ok(res);
 
-       //  Optional<AccountEntity> accountEntity = accountRepo.findById(res.getId());
+        //  Optional<AccountEntity> accountEntity = accountRepo.findById(res.getId());
 
         //System.out.println(res.getFrom());
 
@@ -85,9 +87,36 @@ public class AccountController {
                             }
                         }).collect(Collectors.toList());
 
-                       // System.out.println(String.valueOf(statementEntitiesFilterd.get(0).getId()));
+                        // System.out.println(String.valueOf(statementEntitiesFilterd.get(0).getId()));
+                        if (res.getAmountFrom() != null && res.getAmountTo() != null) {
+                            double From = Double.valueOf(res.getAmountFrom());
+                            System.out.println(From);
+                            double To = Double.parseDouble(valueOf(res.getAmountTo()));
+                            System.out.println(To);
+                            if (From < To || From > To) {
 
-                        return ResponseHandler.generateResponse(accountEntity,statementEntitiesFilterd,HttpStatus.OK, false, "Success", null);
+                                statementEntitiesFilterd =  statementEntities.stream().filter(new Predicate<StatementEntity>(){
+                                    @Override
+                                    public boolean test(StatementEntity statementEntity) {
+                                        double statementEntityAmount = Double.valueOf(statementEntity.getAmount());
+//                                    return statementEntityDate.after(fromTime) && statementEntityDate.before(toTime);
+
+                                        if ((statementEntityAmount == From || statementEntityAmount == To))
+                                            return ((statementEntityAmount == From || statementEntityAmount == To));
+
+                                        else if (statementEntityAmount > From && statementEntityAmount < To)
+                                            return (statementEntityAmount > From && statementEntityAmount < To);
+                                        return false;
+                                    }
+
+                                }).collect(Collectors.toList());
+
+                            }
+                        }
+
+
+                        //printing statements filterd by date
+                        return ResponseHandler.generateResponse(accountEntity, statementEntitiesFilterd, HttpStatus.OK, false, "Success", null);
 
 
                         //  return new ResponseEntity<>(statementEntitiesFilterd, HttpStatus.OK);
@@ -101,21 +130,24 @@ public class AccountController {
                     throw new ApiRequestException("one of dates are not valid");
                 }
             } else {
+
+
+                //printing every statement if there is no date or amount
                 List<StatementEntity> statementEntities = accountRepo.findAccountEntityById(res.getId()).get().getStatementEntity();
 
 
                 //List<StatementEntity> statementEntitiesInThreeMonth = statmentRepo.findStatementEntitiesByCreatedAtBetweenAndAccountEntity_Id(Date.from(LocalDateTime.now().minusMonths(3).toInstant(ZoneOffset.UTC)), Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)), id);
                 //return new ResponseEntity<>(statementEntitiesInThreeMonth, HttpStatus.OK);
 
-                return ResponseHandler.generateResponse(accountEntity,statementEntities,HttpStatus.OK, false, "Success", null);
+                return ResponseHandler.generateResponse(accountEntity, statementEntities, HttpStatus.OK, false, "Success", null);
 
-            //    return new ResponseEntity<>(statementEntities, HttpStatus.OK);
+                //    return new ResponseEntity<>(statementEntities, HttpStatus.OK);
             }
         } else {
             throw new ApiRequestException("account not found");
 
         }
     }
-    }
+}
 
 
