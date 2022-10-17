@@ -104,8 +104,8 @@ public class AccountController {
                                         if ((statementEntityAmount == From || statementEntityAmount == To))
                                             return ((statementEntityAmount == From || statementEntityAmount == To));
 
-                                        else if (statementEntityAmount > From && statementEntityAmount < To)
-                                            return (statementEntityAmount > From && statementEntityAmount < To);
+                                        else if (statementEntityAmount >= From && statementEntityAmount <= To)
+                                            return (statementEntityAmount >= From && statementEntityAmount <= To);
                                         return false;
                                     }
 
