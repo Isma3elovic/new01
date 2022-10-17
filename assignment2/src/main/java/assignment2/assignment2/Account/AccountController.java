@@ -93,8 +93,8 @@ public class AccountController {
                             System.out.println(From);
                             double To = Double.parseDouble(valueOf(res.getAmountTo()));
                             System.out.println(To);
-                            if (From < To || From > To) {
-
+                            if (From < To ) {
+                                try{
                                 statementEntitiesFilterd =  statementEntities.stream().filter(new Predicate<StatementEntity>(){
                                     @Override
                                     public boolean test(StatementEntity statementEntity) {
@@ -111,7 +111,11 @@ public class AccountController {
 
                                 }).collect(Collectors.toList());
 
+                            }catch (Exception e){
+                                    throw new ApiRequestException("error");
+                                }
                             }
+
                         }
 
 
