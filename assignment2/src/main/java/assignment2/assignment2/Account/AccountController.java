@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +45,7 @@ public class AccountController {
         Response res = new Response();
         BeanUtils.copyProperties(req, res);
         System.out.println(res.getId());
+        System.out.println("two "+ res.getAmountTo());
         // return ResponseEntity.ok(res);
 
         //  Optional<AccountEntity> accountEntity = accountRepo.findById(res.getId());
@@ -53,12 +55,14 @@ public class AccountController {
         Optional<AccountEntity> accountEntity = accountRepo.findAccountEntityById(res.getId());
         if (accountEntity.isPresent()) {
             System.out.println();
+
             if (res.getFrom() != null && res.getTo() != null) {
                 //     System.out.println("hello");
                 try {
-                    Date fromTime = new SimpleDateFormat("dd.MM.yyyy").parse(res.getFrom());
+                    Date fromTime = new SimpleDateFormat("dd.MM.yyyy").parse(res.getFrom().replaceAll("[-+^*!@#$%^&]*", "").strip());
+
                     System.out.println(fromTime);
-                    Date toTime = new SimpleDateFormat("dd.MM.yyyy").parse(res.getTo());
+                    Date toTime = new SimpleDateFormat("dd.MM.yyyy").parse(res.getTo().replaceAll("[-+^!@#$%^&]*", "").strip());
                     System.out.println(toTime);
                     if (fromTime.before(toTime)) {
                         List<StatementEntity> statementEntities = accountRepo.findAccountEntityById(res.getId()).get().getStatementEntity();
@@ -70,14 +74,15 @@ public class AccountController {
                                     Date statementEntityDate = new SimpleDateFormat("dd.MM.yyyy").parse(statementEntity.getDate());
 //
 //                                    return statementEntityDate.after(fromTime) && statementEntityDate.before(toTime);
-
+//                                    return Date.from(LocalDateTime.of(2021, Month.DECEMBER,3,6,30,40,50000).minusMonths(3).toInstant(ZoneOffset.UTC),
+//                                            Date.from(LocalDateTime.of(2021,Month.SEPTEMBER,1,12,6,3,4),res.getId());
 
                                     if ((statementEntityDate.equals(fromTime) || statementEntityDate.equals(toTime)))
                                         return statementEntityDate.equals(fromTime) || statementEntityDate.equals(toTime);
 
                                     else if (statementEntityDate.after(fromTime) && statementEntityDate.before(toTime))
                                         return (statementEntityDate.after(fromTime) && statementEntityDate.before(toTime));
-//                                ( (statementEntityDate.after(fromTime) && statementEntityDate.before(toTime)));
+
                                     else
                                         return false;
 
@@ -87,33 +92,39 @@ public class AccountController {
                             }
                         }).collect(Collectors.toList());
 
+
                         // System.out.println(String.valueOf(statementEntitiesFilterd.get(0).getId()));
                         if (res.getAmountFrom() != null && res.getAmountTo() != null) {
-                            double From = Double.valueOf(res.getAmountFrom());
-                            System.out.println(From);
-                            double To = Double.parseDouble(valueOf(res.getAmountTo()));
-                            System.out.println(To);
-                            if (From < To ) {
-                                try{
-                                statementEntitiesFilterd =  statementEntities.stream().filter(new Predicate<StatementEntity>(){
-                                    @Override
-                                    public boolean test(StatementEntity statementEntity) {
-                                        double statementEntityAmount = Double.valueOf(statementEntity.getAmount());
-//                                    return statementEntityDate.after(fromTime) && statementEntityDate.before(toTime);
+                            double From = Double.parseDouble(res.getAmountFrom().replaceAll("[-*+^!@#$%^&]*", "").strip());
+                            System.out.println("one "+ From);
+                            double To = Double.parseDouble(res.getAmountTo().replaceAll("[-+^!*@#$%^&]*", "").strip());
+                            System.out.println("two "+ To);
 
-                                        if ((statementEntityAmount == From || statementEntityAmount == To))
-                                            return ((statementEntityAmount == From || statementEntityAmount == To));
 
-                                        else if (statementEntityAmount >= From && statementEntityAmount <= To)
-                                            return (statementEntityAmount >= From && statementEntityAmount <= To);
-                                        return false;
-                                    }
+                            if (From < To) {
+                                try {
+                                    statementEntitiesFilterd = statementEntities.stream().filter(new Predicate<StatementEntity>() {
+                                        @Override
+                                        public boolean test(StatementEntity statementEntity) {
+                                            double statementEntityAmount = Double.parseDouble(statementEntity.getAmount());
+                                            System.out.println("hello");
+                                            if (statementEntityAmount >= From && statementEntityAmount <= To)
+                                                return (statementEntityAmount >= From && statementEntityAmount <= To);
 
-                                }).collect(Collectors.toList());
+                                            return false;
+                                        }
 
-                            }catch (Exception e){
-                                    throw new ApiRequestException("error");
+                                    }).collect(Collectors.toList());
+
+                                } catch (Exception e) {
+                                    throw new ApiRequestException("error amount is not valid");
                                 }
+
+                            } else if(From >= To) {
+//
+//
+                                        throw new ApiRequestException("error amount is not valid");
+
                             }
 
                         }
@@ -126,12 +137,12 @@ public class AccountController {
                         //  return new ResponseEntity<>(statementEntitiesFilterd, HttpStatus.OK);
 
                     } else {
-                        throw new ApiRequestException("from date should be before ");
+                        throw new ApiRequestException("check entery ");
                     }
 
                 } catch (Exception exception) {
 
-                    throw new ApiRequestException("one of dates are not valid");
+                    throw new ApiRequestException("enteries are not valid");
                 }
             } else {
 
